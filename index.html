@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rockview Recovery — UX Recommendations | Molitaris</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #fafafa;
+      --surface: #fff;
+      --border: #e5e5e5;
+      --border-light: #f0f0f0;
+      --text: #1a1a1a;
+      --text-muted: #666;
+      --text-light: #999;
+      --accent: #b8922e;
+      --green: #1a7a3a;
+      --green-bg: #edf7f0;
+      --red: #c0392b;
+      --red-bg: #fdf0ef;
+      --amber: #b8760a;
+      --amber-bg: #fef8ee;
+      --dark: #1E1E1E;
+      --lp-bg: #f5f1e8;
+      --lp-card-border: #e0ddd4;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+    /* Nav */
+    nav { position: sticky; top: 0; z-index: 100; background: var(--dark); padding: 0 48px; }
+    .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+    .nav-logo { display: flex; align-items: center; }
+    .nav-logo img { width: 140px; height: auto; }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a { color: #aaa; text-decoration: none; font-size: 12px; font-weight: 500; letter-spacing: 0.5px; transition: color 0.2s; }
+    .nav-links a:hover { color: #fff; }
+
+    /* Cover */
+    .cover { background: var(--dark); padding: 80px 48px 72px; text-align: center; }
+    .cover-inner { max-width: 700px; margin: 0 auto; }
+    .cover-label { font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+    .cover h1 { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 2px; color: #fff; line-height: 1.1; margin-bottom: 16px; }
+    .cover p { font-size: 15px; color: #999; line-height: 1.7; margin-bottom: 32px; }
+    .cover-meta { display: flex; justify-content: center; gap: 36px; font-size: 12px; color: #777; }
+    .cover-meta strong { color: #ccc; }
+
+    /* Layout */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
+    .section { padding: 72px 0; }
+    .section + .section { border-top: 1px solid var(--border); }
+    .section-label { font-size: 11px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+    .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 1px; margin-bottom: 8px; }
+    .section-desc { font-size: 14px; color: var(--text-muted); max-width: 600px; line-height: 1.7; margin-bottom: 48px; }
+
+    /* Rec header */
+    .rec { margin-bottom: 56px; }
+    .rec:last-child { margin-bottom: 0; }
+    .rec-top { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+    .rec-num { width: 32px; height: 32px; border-radius: 50%; background: var(--dark); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+    .rec-title-group { flex: 1; }
+    .rec-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+    .rec-subtitle { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .rec-tags { display: flex; gap: 6px; flex-shrink: 0; margin-top: 4px; }
+    .tag { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.3px; }
+    .tag-high { background: var(--green-bg); color: var(--green); }
+    .tag-medium { background: var(--amber-bg); color: var(--amber); }
+
+    /* Device label */
+    .device-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px; color: var(--text-muted); }
+
+    /* Comparison grid */
+    .comparison { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--surface); }
+    .comp-side { padding: 28px; }
+    .comp-side:first-child { border-right: 1px solid var(--border); background: #fff; }
+    .comp-side:last-child { background: #f8faf8; }
+    .comp-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 6px; }
+    .comp-label-current { color: var(--red); }
+    .comp-label-proposed { color: var(--green); }
+    .comp-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .comp-dot-red { background: var(--red); }
+    .comp-dot-green { background: var(--green); }
+
+    /* Phone frame — fixed height for consistency */
+    .phone-frame { width: 240px; margin: 0 auto; background: #111; border-radius: 32px; padding: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+    .phone-screen { border-radius: 24px; overflow: hidden; background: #fff; position: relative; height: 480px; }
+    .phone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 80px; height: 20px; background: #111; border-radius: 0 0 12px 12px; z-index: 2; }
+    .phone-content { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .phone-content::-webkit-scrollbar { width: 2px; }
+    .phone-content::-webkit-scrollbar-thumb { background: #ccc; border-radius: 1px; }
+    .phone-content img { width: 100%; display: block; }
+    .scroll-hint { text-align: center; margin-top: 8px; font-size: 10px; color: var(--text-light); }
+    .scroll-hint-pulse { animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+    /* Result box */
+    .result-box { margin-top: 16px; padding: 14px 18px; border-radius: 8px; font-size: 13px; line-height: 1.6; }
+    .result-green { background: var(--green-bg); color: var(--green); }
+
+    /* LP-style testimonial card (matches rockviewrecovery.com) */
+    .lp-testimonials-bg {
+      background-color: var(--lp-bg);
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 10 Q35 5 40 10 Q45 15 40 20 Q35 18 30 20 Q25 18 20 20 Q15 15 20 10 Q25 5 30 10Z' fill='%23e8e2d4' fill-opacity='0.3'/%3E%3C/svg%3E");
+      padding: 20px 14px;
+      height: 100%;
+    }
+    .lp-card { background: #fff; border: 1px solid var(--lp-card-border); border-radius: 10px; padding: 16px; }
+    .lp-stars { color: #e8a830; font-size: 14px; margin-bottom: 10px; letter-spacing: 2px; }
+    .lp-quote { font-size: 11px; color: #444; line-height: 1.7; margin-bottom: 14px; }
+    .lp-author { display: flex; align-items: center; gap: 8px; }
+    .lp-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .lp-name { font-size: 11px; font-weight: 600; color: #333; }
+    .lp-role { font-size: 10px; color: #999; }
+
+    /* Carousel controls */
+    .carousel-wrap { position: relative; overflow: hidden; border-radius: 10px; }
+    .carousel-track { display: flex; transition: transform 0.4s ease; }
+    .carousel-slide { min-width: 100%; padding: 0 2px; box-sizing: border-box; }
+    .carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.9); border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #333; z-index: 2; box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+    .carousel-arrow:hover { background: #fff; }
+    .carousel-arrow-l { left: 6px; }
+    .carousel-arrow-r { right: 6px; }
+    .carousel-dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
+    .carousel-dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; cursor: pointer; transition: all 0.2s; }
+    .carousel-dot.active { background: var(--accent); width: 18px; border-radius: 4px; }
+
+    /* Desktop proposed — mockup lives inside a border frame */
+    .dt-mockup-frame { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .dt-mockup-content { background: var(--lp-bg); padding: 32px 36px; }
+    .dt-carousel-wrap { position: relative; overflow: hidden; }
+    .dt-carousel-track { display: flex; transition: transform 0.4s ease; }
+    .dt-carousel-slide { width: 33.333%; flex-shrink: 0; padding: 0 6px; box-sizing: border-box; }
+    .dt-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.95); border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; color: #333; z-index: 2; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
+    .dt-arrow:hover { background: #fff; }
+    .dt-card { background: #fff; border: 1px solid var(--lp-card-border); border-radius: 10px; padding: 20px; }
+    .dt-stars { color: #e8a830; font-size: 15px; margin-bottom: 10px; letter-spacing: 2px; }
+    .dt-quote { font-size: 13px; color: #444; line-height: 1.7; margin-bottom: 14px; }
+    .dt-author { display: flex; align-items: center; gap: 10px; }
+    .dt-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .dt-name { font-size: 13px; font-weight: 600; color: #333; }
+    .dt-role { font-size: 11px; color: #999; }
+
+    /* Footer */
+    footer { background: var(--dark); padding: 40px 48px; text-align: center; }
+    footer .logo { margin-bottom: 10px; }
+    footer .logo img { width: 180px; height: auto; }
+    footer p { font-size: 12px; color: #666; }
+
+    @media (max-width: 900px) {
+      .comparison { grid-template-columns: 1fr; }
+      .comp-side:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+      .cover h1 { font-size: 36px; }
+      .container { padding: 0 24px; }
+      .cover { padding: 60px 24px 56px; }
+      nav { padding: 0 24px; }
+      .cover-meta { flex-direction: column; gap: 6px; }
+      .rec-top { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo"><img src="shots/molitaris-logo-wht.png" alt="Molitaris Consulting"></div>
+    <div class="nav-links">
+      <a href="#rec-testimonials">Testimonials</a>
+      <a href="#rec-gallery">Gallery</a>
+      <a href="#rec-whyus">Sections</a>
+      <a href="#rec-cta">CTAs</a>
+      <a href="#rec-hero">Hero Form</a>
+    </div>
+  </div>
+</nav>
+
+<div class="cover">
+  <div class="cover-inner">
+    <div style="margin-bottom: 20px;"><img src="shots/rockview-logo.svg" alt="Rock View Recovery" style="height: 50px;"></div>
+    <h1>LANDING PAGE EXPERIENCE<br>RECOMMENDATIONS</h1>
+    <p>The content on your residential LP is strong — great messaging, real testimonials, and a clear value prop. With 90%+ of ad spend driving mobile traffic, there are a few ways to improve the overall experience and tighten the conversion path.</p>
+  </div>
+</div>
+
+<!-- ===== REC 1: TESTIMONIALS ===== -->
+<div class="section" id="rec-testimonials">
+  <div class="container">
+    <div class="section-label">Recommendation 1</div>
+    <div class="section-title">CONDENSE TESTIMONIALS INTO A CAROUSEL</div>
+    <div class="section-desc">The testimonials are great — real reviews from real people. On mobile, all six are stacked vertically which adds a lot of scroll. A carousel would keep all the social proof visible without the extra height.</div>
+
+    <div class="rec">
+      <div class="rec-top">
+        <div class="rec-num">1</div>
+        <div class="rec-title-group">
+          <div class="rec-title">6 Stacked Cards &rarr; Swipeable Carousel</div>
+          <div class="rec-subtitle">On mobile, six stacked review cards take up over 3 full screens of scrolling. On desktop, the 3+3 grid works better but still takes two viewport heights. A carousel with dots and arrows would keep every review accessible in a single screen height on both devices.</div>
+        </div>
+        <div class="rec-tags">
+          <span class="tag tag-high">High Impact</span>
+          <span class="tag tag-medium">Medium Effort</span>
+        </div>
+      </div>
+
+      <!-- MOBILE -->
+      <div style="margin-bottom: 24px;">
+        <div class="device-label">&#9679; MOBILE</div>
+        <div class="comparison">
+          <div class="comp-side">
+            <div class="comp-label comp-label-current"><span class="comp-dot comp-dot-red"></span> CURRENT — SCROLL TO FEEL THE LENGTH</div>
+            <div class="phone-frame">
+              <div class="phone-screen">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                  <img src="shots/mobile-testimonials-v3.png" alt="Mobile testimonials — all 6 stacked">
+                </div>
+              </div>
+            </div>
+            <div class="scroll-hint scroll-hint-pulse">&#8593;&#8595; Scroll inside the phone — this is just the testimonials</div>
+          </div>
+
+          <div class="comp-side">
+            <div class="comp-label comp-label-proposed"><span class="comp-dot comp-dot-green"></span> PROPOSED — CAROUSEL WITH ARROWS</div>
+            <div class="phone-frame">
+              <div class="phone-screen">
+                <div class="phone-notch"></div>
+                <div class="lp-testimonials-bg" style="padding-top: 28px;">
+                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;"><span style="display: inline-block; width: 16px; height: 2px; background: #c0392b;"></span><span style="font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: #8a7b5a; font-weight: 600;">Testimonials</span></div>
+                  <div style="font-size: 15px; font-weight: 400; margin-bottom: 6px; color: #222; line-height: 1.3;">What Clients Say About Us</div>
+                  <div style="font-size: 9px; color: #888; line-height: 1.5; margin-bottom: 12px;">Nothing means more to us than the stories of transformation we're honored to witness every day.</div>
+
+                  <div class="carousel-wrap" id="mob-carousel">
+                    <div class="carousel-arrow carousel-arrow-l" id="mob-prev">&#8249;</div>
+                    <div class="carousel-arrow carousel-arrow-r" id="mob-next">&#8250;</div>
+                    <div class="carousel-track" id="mob-track">
+                      <div class="carousel-slide"><div class="lp-card">
+                        <div class="lp-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        <div class="lp-quote">This is genuinely a very wholesome environment. The relationships that people build here go outside of the houses. Everyone, from staff to the people who live there, are so incredibly supportive. You will never be alone on your journey through Rock View.</div>
+                        <div class="lp-author"><img class="lp-avatar" src="shots/profile-1.webp" alt="Kiley J."><div><div class="lp-name">Kiley J.</div><div class="lp-role">Alumni</div></div></div>
+                      </div></div>
+                      <div class="carousel-slide"><div class="lp-card">
+                        <div class="lp-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        <div class="lp-quote">Excellent community, location, and well appointed homes. With group outings, yoga, swimming, fishing... like-minded folks who go above and beyond to make me feel at home. 10/10</div>
+                        <div class="lp-author"><img class="lp-avatar" src="shots/profile-2.webp" alt="Max B."><div><div class="lp-name">Max B.</div><div class="lp-role">Alumni</div></div></div>
+                      </div></div>
+                      <div class="carousel-slide"><div class="lp-card">
+                        <div class="lp-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        <div class="lp-quote">Rockview is hands down the best program I have ever had the pleasure to be a part of. The community is like a family. If you're looking for a life changing experience, this is it.</div>
+                        <div class="lp-author"><img class="lp-avatar" src="shots/profile-3.webp" alt="Dane H."><div><div class="lp-name">Dane H.</div><div class="lp-role">Alumni</div></div></div>
+                      </div></div>
+                      <div class="carousel-slide"><div class="lp-card">
+                        <div class="lp-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        <div class="lp-quote">The mountain views are absolutely breathtaking. The lake and pools are fantastic, perfect for relaxing and enjoying the beautiful surroundings.</div>
+                        <div class="lp-author"><img class="lp-avatar" src="shots/profile-4.webp" alt="Rodney E."><div><div class="lp-name">Rodney E.</div><div class="lp-role">Alumni</div></div></div>
+                      </div></div>
+                      <div class="carousel-slide"><div class="lp-card">
+                        <div class="lp-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        <div class="lp-quote">Absolutely love these guys! A very safe place for recovery and high accountability. Best Sober Living homes ever!</div>
+                        <div class="lp-author"><img class="lp-avatar" src="shots/profile-4.webp" alt="Natalie"><div><div class="lp-name">Natalie</div><div class="lp-role">Alumni</div></div></div>
+                      </div></div>
+                      <div class="carousel-slide"><div class="lp-card">
+                        <div class="lp-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        <div class="lp-quote">A beacon of hope. The compassionate staff and beautiful environment foster healing and growth.</div>
+                        <div class="lp-author"><img class="lp-avatar" src="shots/profile-5.webp" alt="Michelle P."><div><div class="lp-name">Michelle P.</div><div class="lp-role">Rock View Family</div></div></div>
+                      </div></div>
+                    </div>
+                  </div>
+                  <div class="carousel-dots" id="mob-dots">
+                    <div class="carousel-dot active" data-i="0"></div>
+                    <div class="carousel-dot" data-i="1"></div>
+                    <div class="carousel-dot" data-i="2"></div>
+                    <div class="carousel-dot" data-i="3"></div>
+                    <div class="carousel-dot" data-i="4"></div>
+                    <div class="carousel-dot" data-i="5"></div>
+                  </div>
+                  <div style="text-align: center; margin-top: 8px; font-size: 9px; color: #aaa;">5.0 &#9733; from 33 Google Reviews</div>
+                </div>
+              </div>
+            </div>
+            <div class="result-box result-green">
+              <strong>Result:</strong> Same 6 testimonials, ~80% less scroll. Arrows + dots + swipe.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DESKTOP -->
+      <div>
+        <div class="device-label">&#9679; DESKTOP</div>
+        <div class="dt-mockup-frame">
+          <div class="dt-mockup-content">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;"><span style="display: inline-block; width: 20px; height: 2px; background: #c0392b;"></span><span style="font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #8a7b5a; font-weight: 600;">Testimonials</span></div>
+            <div style="font-size: 24px; font-weight: 400; margin-bottom: 4px; color: #222;">What Clients Say About Us</div>
+            <div style="font-size: 13px; color: #888; margin-bottom: 24px;">Nothing means more to us than the stories of transformation we're honored to witness every day.</div>
+
+            <div class="dt-carousel-wrap" id="dt-carousel">
+              <div class="dt-arrow" style="left: 8px;" id="dt-prev">&#8249;</div>
+              <div class="dt-arrow" style="right: 8px;" id="dt-next">&#8250;</div>
+              <div class="dt-carousel-track" id="dt-track">
+                <div class="dt-carousel-slide"><div class="dt-card">
+                  <div class="dt-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                  <div class="dt-quote">This is genuinely a very wholesome environment. The relationships that people build here go outside of the houses. Everyone, from staff to the people who live there, are so incredibly supportive. You will never be alone on your journey through Rock View.</div>
+                  <div class="dt-author"><img class="dt-avatar" src="shots/profile-1.webp" alt="Kiley J."><div><div class="dt-name">Kiley J.</div><div class="dt-role">Alumni</div></div></div>
+                </div></div>
+                <div class="dt-carousel-slide"><div class="dt-card">
+                  <div class="dt-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                  <div class="dt-quote">Excellent community, location, and well appointed homes. With group outings, yoga, swimming, fishing... like-minded folks who go above and beyond to make me feel at home. 10/10</div>
+                  <div class="dt-author"><img class="dt-avatar" src="shots/profile-2.webp" alt="Max B."><div><div class="dt-name">Max B.</div><div class="dt-role">Alumni</div></div></div>
+                </div></div>
+                <div class="dt-carousel-slide"><div class="dt-card">
+                  <div class="dt-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                  <div class="dt-quote">Rockview is hands down the best program I have ever had the pleasure to be a part of. The community is like a family. If you're looking for a life changing experience, this is it.</div>
+                  <div class="dt-author"><img class="dt-avatar" src="shots/profile-3.webp" alt="Dane H."><div><div class="dt-name">Dane H.</div><div class="dt-role">Alumni</div></div></div>
+                </div></div>
+                <div class="dt-carousel-slide"><div class="dt-card">
+                  <div class="dt-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                  <div class="dt-quote">The mountain views are absolutely breathtaking. The lake and pools are fantastic, perfect for relaxing and enjoying the beautiful surroundings.</div>
+                  <div class="dt-author"><img class="dt-avatar" src="shots/profile-4.webp" alt="Rodney E."><div><div class="dt-name">Rodney E.</div><div class="dt-role">Alumni</div></div></div>
+                </div></div>
+                <div class="dt-carousel-slide"><div class="dt-card">
+                  <div class="dt-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                  <div class="dt-quote">Absolutely love these guys! A very safe place for recovery and high accountability. Best Sober Living homes ever!</div>
+                  <div class="dt-author"><img class="dt-avatar" src="shots/profile-4.webp" alt="Natalie"><div><div class="dt-name">Natalie</div><div class="dt-role">Alumni</div></div></div>
+                </div></div>
+                <div class="dt-carousel-slide"><div class="dt-card">
+                  <div class="dt-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                  <div class="dt-quote">A beacon of hope. The compassionate staff and beautiful environment foster healing and growth.</div>
+                  <div class="dt-author"><img class="dt-avatar" src="shots/profile-5.webp" alt="Michelle P."><div><div class="dt-name">Michelle P.</div><div class="dt-role">Rock View Family</div></div></div>
+                </div></div>
+              </div>
+            </div>
+            <div style="text-align: center; margin-top: 14px; font-size: 12px; color: #aaa;">5.0 &#9733; from 33 Google Reviews &nbsp;&middot;&nbsp; showing 3 of 6 &mdash; click arrows to browse</div>
+          </div>
+        </div>
+        <div class="result-box result-green" style="margin-top: 16px;">
+          <strong>Desktop:</strong> 3+3 stacked grid &rarr; single scrollable row. All 6 reviews stay accessible, half the page height.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== REC 2: GALLERY CAROUSELS ===== -->
+<div class="section" id="rec-gallery">
+  <div class="container">
+    <div class="section-label">Recommendation 2</div>
+    <div class="section-title">MERGE TWO GALLERY CAROUSELS INTO ONE</div>
+    <div class="section-desc">The facility photos look great. Right now there are two separate carousels stacked on top of each other — merging them into one and adding labels would make it easier for visitors to browse.</div>
+
+    <div class="rec">
+      <div class="rec-top">
+        <div class="rec-num">2</div>
+        <div class="rec-title-group">
+          <div class="rec-title">2 Carousels &rarr; 1 Labeled Carousel</div>
+          <div class="rec-subtitle">The "Inside Rock View Recovery" carousel and the "Rock View Experience" section both showcase the facility. Combining them into one carousel with labeled photos would streamline the experience and reduce scroll.</div>
+        </div>
+        <div class="rec-tags">
+          <span class="tag tag-high">High Impact</span>
+          <span class="tag tag-medium">Medium Effort</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="device-label">&#9679; MOBILE</div>
+        <div class="comparison">
+          <div class="comp-side">
+            <div class="comp-label comp-label-current"><span class="comp-dot comp-dot-red"></span> CURRENT — 2 CAROUSELS + CTA BETWEEN</div>
+            <div class="phone-frame">
+              <div class="phone-screen">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                  <img src="shots/mobile-gallery-v3.png" alt="Two separate gallery carousels on mobile">
+                </div>
+              </div>
+            </div>
+            <div class="scroll-hint scroll-hint-pulse">&#8593;&#8595; Two carousels + CTA break + unlabeled photos</div>
+          </div>
+
+          <div class="comp-side">
+            <div class="comp-label comp-label-proposed"><span class="comp-dot comp-dot-green"></span> PROPOSED — 1 LABELED CAROUSEL</div>
+            <div class="phone-frame">
+              <div class="phone-screen">
+                <div class="phone-notch"></div>
+                <div class="lp-testimonials-bg" style="padding-top: 28px;">
+                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;"><span style="display: inline-block; width: 16px; height: 2px; background: #c0392b;"></span><span style="font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: #8a7b5a; font-weight: 600;">Gallery</span></div>
+                  <div style="font-size: 15px; font-weight: 400; margin-bottom: 12px; color: #222; line-height: 1.3;">Inside Rock View Recovery</div>
+
+                  <div class="carousel-wrap" id="gal-carousel">
+                    <div class="carousel-arrow carousel-arrow-l" id="gal-prev">&#8249;</div>
+                    <div class="carousel-arrow carousel-arrow-r" id="gal-next">&#8250;</div>
+                    <div class="carousel-track" id="gal-track">
+                      <div class="carousel-slide"><div style="position: relative; border-radius: 10px; overflow: hidden;">
+                        <img src="shots/gallery-entrance.jpg" alt="Entrance at Twilight" style="width: 100%; display: block; aspect-ratio: 3/2; object-fit: cover;">
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 8px 12px; background: linear-gradient(transparent, rgba(0,0,0,0.6)); color: #fff; font-size: 11px; font-weight: 600;">Entrance at Twilight</div>
+                      </div></div>
+                      <div class="carousel-slide"><div style="position: relative; border-radius: 10px; overflow: hidden;">
+                        <img src="shots/gallery-lounge.jpg" alt="Pool &amp; Waterfall" style="width: 100%; display: block; aspect-ratio: 3/2; object-fit: cover;">
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 8px 12px; background: linear-gradient(transparent, rgba(0,0,0,0.6)); color: #fff; font-size: 11px; font-weight: 600;">Pool &amp; Waterfall</div>
+                      </div></div>
+                      <div class="carousel-slide"><div style="position: relative; border-radius: 10px; overflow: hidden;">
+                        <img src="shots/gallery-pool.jpg" alt="Private Bedroom" style="width: 100%; display: block; aspect-ratio: 3/2; object-fit: cover;">
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 8px 12px; background: linear-gradient(transparent, rgba(0,0,0,0.6)); color: #fff; font-size: 11px; font-weight: 600;">Private Bedroom</div>
+                      </div></div>
+                      <div class="carousel-slide"><div style="position: relative; border-radius: 10px; overflow: hidden;">
+                        <img src="shots/gallery-seating.jpg" alt="Mountain View Lounge" style="width: 100%; display: block; aspect-ratio: 3/2; object-fit: cover;">
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 8px 12px; background: linear-gradient(transparent, rgba(0,0,0,0.6)); color: #fff; font-size: 11px; font-weight: 600;">Mountain View Lounge</div>
+                      </div></div>
+                      <div class="carousel-slide"><div style="position: relative; border-radius: 10px; overflow: hidden;">
+                        <img src="shots/gallery-exterior.jpg" alt="Grand Foyer" style="width: 100%; display: block; aspect-ratio: 3/2; object-fit: cover;">
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 8px 12px; background: linear-gradient(transparent, rgba(0,0,0,0.6)); color: #fff; font-size: 11px; font-weight: 600;">Grand Foyer</div>
+                      </div></div>
+                    </div>
+                  </div>
+                  <div class="carousel-dots" id="gal-dots">
+                    <div class="carousel-dot active" data-i="0"></div>
+                    <div class="carousel-dot" data-i="1"></div>
+                    <div class="carousel-dot" data-i="2"></div>
+                    <div class="carousel-dot" data-i="3"></div>
+                    <div class="carousel-dot" data-i="4"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="result-box result-green">
+              <strong>Result:</strong> 2 carousels &rarr; 1. Labels on every photo. Removes a CTA break between them.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== REC 3: CONSOLIDATE OVERLAPPING SECTIONS ===== -->
+<div class="section" id="rec-whyus">
+  <div class="container">
+    <div class="section-label">Recommendation 3</div>
+    <div class="section-title">CONSOLIDATE OVERLAPPING SECTIONS</div>
+    <div class="section-desc">The page has some sections that cover similar ground in different places. Consolidating these would tighten the page without losing any of the messaging.</div>
+
+    <div class="rec">
+      <div class="rec-top">
+        <div class="rec-num">3</div>
+        <div class="rec-title-group">
+          <div class="rec-title">Consolidate Similar Sections</div>
+          <div class="rec-subtitle">There are two groups of content that cover similar themes in multiple places across the page. Merging each group into one section would keep the messaging focused and cut page length.</div>
+        </div>
+        <div class="rec-tags">
+          <span class="tag tag-high">High Impact</span>
+          <span class="tag tag-high">Easy</span>
+        </div>
+      </div>
+
+      <!-- WHY US -->
+      <div style="margin-bottom: 40px;">
+        <div class="device-label">&#9679; 3 "WHY US" SECTIONS SAYING THE SAME THING</div>
+        <div style="display: flex; gap: 12px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px; justify-content: center;">
+          <div style="flex-shrink: 0; width: 240px;">
+            <div class="phone-frame">
+              <div class="phone-screen" style="height: auto; max-height: none;">
+                <div class="phone-notch"></div>
+                <div style="padding-top: 20px;"><img src="shots/mobile-section1.png" alt="Section 1 — Lasting Recovery" style="width: 100%; display: block;"></div>
+              </div>
+            </div>
+            <div style="text-align: center; margin-top: 8px; font-size: 10px; color: var(--red); font-weight: 600;">"Lasting Recovery"</div>
+          </div>
+          <div style="flex-shrink: 0; width: 240px;">
+            <div class="phone-frame">
+              <div class="phone-screen" style="height: auto; max-height: none;">
+                <div class="phone-notch"></div>
+                <div style="padding-top: 20px;"><img src="shots/mobile-section2.png" alt="Section 2 — What Makes Rock View The Best" style="width: 100%; display: block;"></div>
+              </div>
+            </div>
+            <div style="text-align: center; margin-top: 8px; font-size: 10px; color: var(--red); font-weight: 600;">"What Makes Rock View The Best"</div>
+          </div>
+          <div style="flex-shrink: 0; width: 240px;">
+            <div class="phone-frame">
+              <div class="phone-screen" style="height: auto; max-height: none;">
+                <div class="phone-notch"></div>
+                <div style="padding-top: 20px;"><img src="shots/mobile-section3.png" alt="Section 3 — Care in Every Detail" style="width: 100%; display: block;"></div>
+              </div>
+            </div>
+            <div style="text-align: center; margin-top: 8px; font-size: 10px; color: var(--red); font-weight: 600;">"Care in Every Detail"</div>
+          </div>
+        </div>
+        <div class="result-box result-green" style="max-width: 780px;">
+          <strong>Recommendation:</strong> Merge all three into a single "Why Rock View" section. Same differentiators, one place — cuts ~2 full screen-heights of scroll.
+        </div>
+      </div>
+
+      <!-- ROCK VIEW EXPERIENCE -->
+      <div>
+        <div class="device-label">&#9679; 3 "ROCK VIEW EXPERIENCE" SECTIONS</div>
+        <div style="display: flex; gap: 12px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px; justify-content: center;">
+          <div style="flex-shrink: 0; width: 240px;">
+            <div class="phone-frame">
+              <div class="phone-screen" style="height: auto; max-height: none;">
+                <div class="phone-notch"></div>
+                <div style="padding-top: 20px;"><img src="shots/mobile-exp1.png" alt="Rock View Experience 1" style="width: 100%; display: block;"></div>
+              </div>
+            </div>
+            <div style="text-align: center; margin-top: 8px; font-size: 10px; color: var(--red); font-weight: 600;">"Where Phoenix Beauty Meets Focused Healing"</div>
+          </div>
+          <div style="flex-shrink: 0; width: 240px;">
+            <div class="phone-frame">
+              <div class="phone-screen" style="height: auto; max-height: none;">
+                <div class="phone-notch"></div>
+                <div style="padding-top: 20px;"><img src="shots/mobile-exp3.png" alt="Rock View Experience Defined" style="width: 100%; display: block;"></div>
+              </div>
+            </div>
+            <div style="text-align: center; margin-top: 8px; font-size: 10px; color: var(--red); font-weight: 600;">"Rock View Experience Defined"</div>
+          </div>
+          <div style="flex-shrink: 0; width: 240px;">
+            <div class="phone-frame">
+              <div class="phone-screen" style="height: auto; max-height: none;">
+                <div class="phone-notch"></div>
+                <div style="padding-top: 20px;"><img src="shots/mobile-exp2.png" alt="Your Recovery Can Start Today" style="width: 100%; display: block;"></div>
+              </div>
+            </div>
+            <div style="text-align: center; margin-top: 8px; font-size: 10px; color: var(--red); font-weight: 600;">"Your Recovery Can Start Today"</div>
+          </div>
+        </div>
+        <div class="result-box result-green" style="max-width: 780px;">
+          <strong>Recommendation:</strong> These three dark-background "Rock View Experience" sections are spread across the page with nearly identical messaging and CTAs. Consolidate into one.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== REC 4: CTA REPETITION ===== -->
+<div class="section" id="rec-cta">
+  <div class="container">
+    <div class="section-label">Recommendation 4</div>
+    <div class="section-title">REDUCE REDUNDANT CTA BREAKS</div>
+    <div class="section-desc">The call-to-action blocks are solid — just appearing more often than needed. Trimming from 6 to 3 strategic placements would reduce scroll without losing conversion opportunities.</div>
+
+    <div class="rec">
+      <div class="rec-top">
+        <div class="rec-num">4</div>
+        <div class="rec-title-group">
+          <div class="rec-title">6 CTA Breaks &rarr; 3 Strategic Placements</div>
+          <div class="rec-subtitle">Each CTA break adds 200–400 pixels of scroll. Three well-placed CTAs — after the hero, after social proof, and at the close — would hit the moments when a visitor is most ready to act.</div>
+        </div>
+        <div class="rec-tags">
+          <span class="tag tag-high">High Impact</span>
+          <span class="tag tag-high">Easy</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div>
+          <div class="comp-label comp-label-current"><span class="comp-dot comp-dot-red"></span> CURRENT PAGE FLOW</div>
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid #ddd; background: #f9f9f9; color: #666;">Hero</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 600; border-left: 3px solid var(--amber); background: var(--amber-bg); color: var(--amber);">CTA — Call + Check Insurance</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid #ddd; background: #f9f9f9; color: #666;">Program Cards</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 600; border-left: 3px solid var(--amber); background: var(--amber-bg); color: var(--amber);">CTA — "Ready to take the first step?"</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid #ddd; background: #f9f9f9; color: #666;">Residential Care for Lasting Recovery</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 600; border-left: 3px solid var(--amber); background: var(--amber-bg); color: var(--amber);">CTA — View Facility</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid #ddd; background: #f9f9f9; color: #666;">Insurance Logos + Form</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid #ddd; background: #f9f9f9; color: #666;">Testimonials</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid #ddd; background: #f9f9f9; color: #666;">Recovery Process</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid #ddd; background: #f9f9f9; color: #666;">Gallery + Experience</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 600; border-left: 3px solid var(--amber); background: var(--amber-bg); color: var(--amber);">CTA — Call + Testimonials</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid #ddd; background: #f9f9f9; color: #666;">Differentiators</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 600; border-left: 3px solid var(--amber); background: var(--amber-bg); color: var(--amber);">CTA — Call</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid #ddd; background: #f9f9f9; color: #666;">Team + FAQ + Amenities</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 600; border-left: 3px solid var(--amber); background: var(--amber-bg); color: var(--amber);">CTA — Final Call + Insurance</div>
+          </div>
+        </div>
+        <div>
+          <div class="comp-label comp-label-proposed"><span class="comp-dot comp-dot-green"></span> PROPOSED PAGE FLOW</div>
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid #ddd; background: #f9f9f9; color: #666;">Hero</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 600; border-left: 3px solid var(--green); background: var(--green-bg); color: var(--green);">&#10003; CTA — Call + Insurance (keep)</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid #ddd; background: #f9f9f9; color: #666;">Program Cards</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid var(--red); background: var(--red-bg); color: var(--red); text-decoration: line-through; opacity: 0.6;">Removed — too close to hero CTA</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid #ddd; background: #f9f9f9; color: #666;">Why Rock View (consolidated)</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid var(--red); background: var(--red-bg); color: var(--red); text-decoration: line-through; opacity: 0.6;">Removed — orphaned</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid #ddd; background: #f9f9f9; color: #666;">Insurance Logos + Form</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid #ddd; background: #f9f9f9; color: #666;">Testimonials (carousel)</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 600; border-left: 3px solid var(--green); background: var(--green-bg); color: var(--green);">&#10003; CTA — Mid-page (after social proof)</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid #ddd; background: #f9f9f9; color: #666;">Recovery Process</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid #ddd; background: #f9f9f9; color: #666;">Inside Rock View Recovery (1 carousel)</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid var(--red); background: var(--red-bg); color: var(--red); text-decoration: line-through; opacity: 0.6;">Removed — redundant</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 500; border-left: 3px solid #ddd; background: #f9f9f9; color: #666;">Team + FAQ</div>
+            <div style="padding: 8px 14px; border-radius: 5px; font-size: 11px; font-weight: 600; border-left: 3px solid var(--green); background: var(--green-bg); color: var(--green);">&#10003; CTA — Final Call + Insurance (keep)</div>
+          </div>
+          <div class="result-box result-green" style="margin-top: 16px;">
+            <strong>Result:</strong> 6 CTAs &rarr; 3. Placed after hero, mid-page (after social proof), and close. Removes ~1,200px of redundant scroll.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== REC 5: HERO FORM ===== -->
+<div class="section" id="rec-hero">
+  <div class="container">
+    <div class="section-label">Recommendation 5</div>
+    <div class="section-title">ADD INSURANCE VERIFICATION FORM TO DESKTOP HERO</div>
+    <div class="section-desc">On desktop, the hero section has a strong headline and CTA buttons — but there's an opportunity to capture leads right above the fold with an inline insurance verification form.</div>
+
+    <div class="rec">
+      <div class="rec-top">
+        <div class="rec-num">5</div>
+        <div class="rec-title-group">
+          <div class="rec-title">Desktop Hero &rarr; Add Inline Form</div>
+          <div class="rec-subtitle">The current desktop hero has the headline on the left with empty space on the right. Adding an insurance verification form directly in the hero gives visitors an immediate action to take — no scrolling needed. We mocked this up previously and it fits naturally into the existing layout.</div>
+        </div>
+        <div class="rec-tags">
+          <span class="tag tag-high">High Impact</span>
+          <span class="tag tag-medium">Medium Effort</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="device-label">&#9679; DESKTOP</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <div>
+            <div class="comp-label comp-label-current"><span class="comp-dot comp-dot-red"></span> CURRENT — EMPTY SPACE ON RIGHT</div>
+            <div style="border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+              <img src="shots/rockview-residential-atf.png" alt="Current desktop hero — no form" style="width: 100%; display: block;">
+            </div>
+          </div>
+          <div>
+            <div class="comp-label comp-label-proposed"><span class="comp-dot comp-dot-green"></span> PROPOSED — INLINE INSURANCE FORM</div>
+            <div style="border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+              <img src="shots/rv-hero-form-mockup.png" alt="Proposed desktop hero with insurance verification form" style="width: 100%; display: block;">
+            </div>
+          </div>
+        </div>
+        <div class="result-box result-green" style="margin-top: 16px;">
+          <strong>Result:</strong> Visitors can verify insurance coverage immediately on landing — no scrolling to find the form. Includes "HIPAA Protected · 100% Confidential · No Obligation" trust signals and a "Same Day Admissions" badge.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="logo"><img src="shots/molitaris-logo-wht.png" alt="Molitaris Consulting"></div>
+  <p>UX Recommendations &middot; Rockview Recovery &middot; March 2026</p>
+</footer>
+
+<script>
+// Mobile carousel
+(function() {
+  const track = document.getElementById('mob-track');
+  const dots = document.querySelectorAll('#mob-dots .carousel-dot');
+  const prev = document.getElementById('mob-prev');
+  const next = document.getElementById('mob-next');
+  if (!track) return;
+  let current = 0, total = dots.length, interval;
+  function goTo(i) { current = ((i % total) + total) % total; track.style.transform = 'translateX(-' + (current*100) + '%)'; dots.forEach((d,j) => d.classList.toggle('active', j===current)); }
+  dots.forEach(d => d.addEventListener('click', () => { goTo(+d.dataset.i); reset(); }));
+  prev.addEventListener('click', () => { goTo(current - 1); reset(); });
+  next.addEventListener('click', () => { goTo(current + 1); reset(); });
+  const wrap = document.getElementById('mob-carousel');
+  let startX = 0;
+  wrap.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+  wrap.addEventListener('touchend', e => { const d = startX - e.changedTouches[0].clientX; if(Math.abs(d)>30){if(d>0)goTo(current+1);else goTo(current-1);} reset(); });
+  wrap.addEventListener('mousedown', e => { startX = e.clientX; e.preventDefault(); });
+  wrap.addEventListener('mouseup', e => { const d = startX - e.clientX; if(Math.abs(d)>30){if(d>0)goTo(current+1);else goTo(current-1);} reset(); });
+  function start() { interval = setInterval(() => goTo(current+1), 4000); }
+  function reset() { clearInterval(interval); start(); }
+  start();
+})();
+
+// Gallery carousel
+(function() {
+  const track = document.getElementById('gal-track');
+  const dots = document.querySelectorAll('#gal-dots .carousel-dot');
+  const prev = document.getElementById('gal-prev');
+  const next = document.getElementById('gal-next');
+  if (!track) return;
+  let current = 0, total = dots.length, interval;
+  function goTo(i) { current = ((i % total) + total) % total; track.style.transform = 'translateX(-' + (current*100) + '%)'; dots.forEach((d,j) => d.classList.toggle('active', j===current)); }
+  dots.forEach(d => d.addEventListener('click', () => { goTo(+d.dataset.i); reset(); }));
+  prev.addEventListener('click', () => { goTo(current - 1); reset(); });
+  next.addEventListener('click', () => { goTo(current + 1); reset(); });
+  const wrap = document.getElementById('gal-carousel');
+  let startX = 0;
+  wrap.addEventListener('mousedown', e => { startX = e.clientX; e.preventDefault(); });
+  wrap.addEventListener('mouseup', e => { const d = startX - e.clientX; if(Math.abs(d)>30){if(d>0)goTo(current+1);else goTo(current-1);} reset(); });
+  function start() { interval = setInterval(() => goTo(current+1), 5000); }
+  function reset() { clearInterval(interval); start(); }
+  start();
+})();
+
+// Desktop carousel — 3 visible, shifts by 1
+(function() {
+  const track = document.getElementById('dt-track');
+  const prev = document.getElementById('dt-prev');
+  const next = document.getElementById('dt-next');
+  if (!track) return;
+  const total = 6, visible = 3;
+  let current = 0;
+  function goTo(i) {
+    current = Math.max(0, Math.min(i, total - visible));
+    // Each slide is 33.333% width, shift by percentage
+    track.style.transform = 'translateX(-' + (current * 33.333) + '%)';
+  }
+  prev.addEventListener('click', () => goTo(current - 1));
+  next.addEventListener('click', () => goTo(current + 1));
+  let startX = 0;
+  track.parentElement.addEventListener('mousedown', e => { startX = e.clientX; e.preventDefault(); });
+  track.parentElement.addEventListener('mouseup', e => { const d = startX - e.clientX; if(Math.abs(d)>30){if(d>0)goTo(current+1);else goTo(current-1);} });
+})();
+</script>
+
+</body>
+</html>
